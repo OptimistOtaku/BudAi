@@ -68,26 +68,26 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <h1>🧠 BudAI</h1>
-        <p className="tagline">Your AI-powered workflow assistant</p>
+        <h1>🤖 AI Concierge Workflow</h1>
+        <p>Powered by OmniDimension AI Agents</p>
       </header>
 
       <main className="App-main">
         <form onSubmit={handleSubmit} className="workflow-form">
           <div className="form-group">
-            <label htmlFor="instruction">What can BudAI automate for you today?</label>
+            <label htmlFor="instruction">What would you like me to help you with?</label>
             <textarea
               id="instruction"
               value={instruction}
               onChange={(e) => setInstruction(e.target.value)}
-              placeholder="e.g., Find a dentist nearby, book the earliest appointment, and add it to my calendar."
+              placeholder="e.g., Find a dentist nearby and book the earliest appointment available, then add it to my calendar"
               rows={4}
               disabled={loading}
             />
           </div>
           
           <button type="submit" disabled={loading || !instruction.trim()}>
-            {loading ? '🤖 BudAI is working...' : '✨ Run Workflow'}
+            {loading ? '🤖 AI Agent Working...' : '🚀 Start AI Workflow'}
           </button>
         </form>
 
