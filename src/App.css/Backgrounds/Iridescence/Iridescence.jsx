@@ -1,9 +1,11 @@
 /*
-	Installed from https://reactbits.dev/tailwind/
+	Installed from https://reactbits.dev/default/
 */
 
 import { Renderer, Program, Mesh, Color, Triangle } from "ogl";
 import { useEffect, useRef } from "react";
+
+import "./Iridescence.css";
 
 const vertexShader = `
 attribute vec2 uv;
@@ -138,5 +140,5 @@ export default function Iridescence({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [color, speed, amplitude, mouseReact]);
 
-  return <div ref={ctnDom} className="w-full h-full" {...rest} />;
+  return <div ref={ctnDom} className="iridescence-container" {...rest} />;
 }

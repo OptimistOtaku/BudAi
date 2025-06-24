@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 
 function App() {
@@ -6,6 +6,8 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
+  const [processingSteps, setProcessingSteps] = useState([]);
+  const [currentStepIndex, setCurrentStepIndex] = useState(-1);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -14,6 +16,8 @@ function App() {
     setLoading(true);
     setError(null);
     setResult(null);
+    setProcessingSteps([]);
+    setCurrentStepIndex(-1);
 
     try {
       const response = await fetch('http://localhost:5000/workflow', {
@@ -28,39 +32,62 @@ function App() {
 
       if (data.success) {
         setResult(data);
+        const steps = data.steps || [];
+        setProcessingSteps(steps);
+        if (steps.length > 0) {
+            setCurrentStepIndex(0); // Start the step simulation
+        } else {
+            // No steps, just show result and stop loading
+            setLoading(false);
+        }
       } else {
         setError(data.error || 'Failed to process workflow');
+        setLoading(false);
       }
     } catch (err) {
       setError('Network error: ' + err.message);
-    } finally {
       setLoading(false);
     }
   };
 
+  useEffect(() => {
+    if (!loading) return;
+
+    if (currentStepIndex < processingSteps.length) {
+        const timer = setTimeout(() => {
+            setCurrentStepIndex(currentStepIndex + 1);
+        }, 1500); // Move to next step every 1.5 seconds
+  
+        return () => clearTimeout(timer);
+    } else if (currentStepIndex >= processingSteps.length && processingSteps.length > 0) {
+        // Finished all steps
+        setLoading(false);
+    }
+  }, [currentStepIndex, processingSteps, loading]);
+
   return (
     <div className="App">
       <header className="App-header">
-        <h1>🤖 AI Concierge Workflow</h1>
-        <p>Powered by OmniDimension AI Agents</p>
+        <h1>🧠 BudAI</h1>
+        <p className="tagline">Your AI-powered workflow assistant</p>
       </header>
 
       <main className="App-main">
         <form onSubmit={handleSubmit} className="workflow-form">
           <div className="form-group">
-            <label htmlFor="instruction">What would you like me to help you with?</label>
+            <label htmlFor="instruction">What can BudAI automate for you today?</label>
             <textarea
               id="instruction"
               value={instruction}
               onChange={(e) => setInstruction(e.target.value)}
-              placeholder="e.g., Find a dentist nearby and book the earliest appointment available, then add it to my calendar"
+              placeholder="e.g., Find a dentist nearby, book the earliest appointment, and add it to my calendar."
               rows={4}
               disabled={loading}
             />
           </div>
           
           <button type="submit" disabled={loading || !instruction.trim()}>
-            {loading ? '🤖 AI Agent Working...' : '🚀 Start AI Workflow'}
+            {loading ? '🤖 BudAI is working...' : '✨ Run Workflow'}
           </button>
         </form>
 
@@ -68,11 +95,29 @@ function App() {
           <div className="loading-section">
             <div className="loading-spinner"></div>
             <p>🤖 Your AI Concierge Agent is processing your request...</p>
-            <div className="agent-status">
-              <p>• Creating/Configuring AI Agent</p>
-              <p>• Dispatching to OmniDimension</p>
-              <p>• Agent will handle: Web Search → Call → Book → Calendar</p>
-            </div>
+            {processingSteps.length > 0 && (
+              <div className="agent-status">
+                <h4>Workflow Steps:</h4>
+                {processingSteps.map((step, index) => {
+                  const stepText = step.action ? `${step.action}: ${step.details}` : step;
+                  let icon = '⏳';
+                  let statusClass = 'pending';
+                  if (index < currentStepIndex) {
+                    icon = '✅';
+                    statusClass = 'done';
+                  } else if (index === currentStepIndex) {
+                    icon = '⚙️';
+                    statusClass = 'in-progress';
+                  }
+                  
+                  return (
+                    <p key={index} className={`step-item ${statusClass}`}>
+                      <span className="step-icon">{icon}</span> {stepText}
+                    </p>
+                  );
+                })}
+              </div>
+            )}
           </div>
         )}
 

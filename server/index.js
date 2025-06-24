@@ -24,7 +24,7 @@ if (!process.env.GOOGLE_APPLICATION_CREDENTIALS) {
   console.warn('Warning: GOOGLE_APPLICATION_CREDENTIALS not set. Calendar events will not be created.');
 }
 
-const DEMO_MODE = process.env.DEMO_MODE === 'true' || true; // Set to true for demo
+const DEMO_MODE = true; // Re-enable demo mode while fixing OmniDimension integration
 
 async function getCalendarClient() {
   if (calendarClient) return calendarClient;
@@ -148,8 +148,20 @@ app.post('/workflow', async (req, res) => {
       agent_id: agentId,
       call_id: fakeCallId,
       status: 'completed',
-      instruction
+      instruction,
+      steps: [
+        "Initializing AI Concierge Agent...",
+        "Searching for nearby dental services...",
+        "Found several options, selecting best rated...",
+        "Preparing to make call to dental office...",
+        "Connecting to Dr. Parul's Dental Clinic...",
+        "Checking appointment availability...",
+        "Confirming appointment details...",
+        "Adding appointment to calendar...",
+        "Finalizing booking and notifications..."
+      ]
     };
+
     // Simulate webhook call after a short delay
     setTimeout(async () => {
       try {
@@ -159,18 +171,19 @@ app.post('/workflow', async (req, res) => {
           extracted_variables: {
             appointment_date: new Date(Date.now() + 3600 * 1000).toISOString(),
             business_name: 'Dr. Parul',
-            business_phone: '+919319063787',
+            business_phone: '+91 9319063787',
             business_address: 'Rohini Sector 10',
             appointment_type: 'Dental Checkup',
             special_instructions: 'Arrive 10 minutes early'
           },
-          summary: 'Appointment booked',
+          summary: 'Appointment booked successfully',
           transcript: 'This is a simulated transcript.'
         });
       } catch (err) {
         console.error('Demo mode: Failed to simulate webhook:', err.message);
       }
     }, 2000); // Webhook after 2 seconds
+
     // Add a realistic delay before responding to the frontend
     setTimeout(() => {
       res.json(workflowResponse);
