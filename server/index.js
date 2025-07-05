@@ -24,7 +24,7 @@ if (!process.env.GOOGLE_APPLICATION_CREDENTIALS) {
   console.warn('Warning: GOOGLE_APPLICATION_CREDENTIALS not set. Calendar events will not be created.');
 }
 
-const DEMO_MODE = true; // Re-enable demo mode while fixing OmniDimension integration
+const DEMO_MODE = false; // Re-enable demo mode while fixing OmniDimension integration
 
 async function getCalendarClient() {
   if (calendarClient) return calendarClient;
